@@ -186,15 +186,70 @@ public class CustomerApplication {
         if (file.isFile()) {
             while ((row = reader.readLine()) != null) {
                 String[] data = row.split(",");
-
-                // do something with the data
+                switch (table)
+                {
+                    case 1:
+                        Tr_type type = new Tr_type(data);
+                        // добавить в БД
+                        break;
+                    case 2:
+                        MCC_code mcc_code = new MCC_code(data);
+                        // добавить в БД
+                        break;
+                    case 3:
+                        Gender_train people = new Gender_train(data);
+                        // добавить в БД
+                        break;
+                    case 4:
+                        Transaction trans = new Transaction(data);
+                        // добавить в БД
+                        break;
+                }
             }
             reader.close();
         }
     }
     public static void save_db(Integer table)
     {
-
+        String row;
+        switch (table)
+        {
+            case 1:
+                Collection<Tr_type> list = getAllTr_types();
+                for (Tr_type item : list)
+                {
+                    row = item.to_csv();
+                    // записать в файл
+                }
+                // добавить в БД
+                break;
+            case 2:
+                Collection<MCC_code> list = getAllMCC_codes();
+                for (MCC_code item : list)
+                {
+                    row = item.to_csv();
+                    // записать в файл
+                }
+                // добавить в БД
+                break;
+            case 3:
+                Collection<Gender_train> list = getAllGender_train();
+                for (Gender_train item : list)
+                {
+                    row = item.to_csv();
+                    // записать в файл
+                }
+                break;
+            case 4:
+                Collection<Transaction> list = getAllTransaction();
+                for (Transaction item : list)
+                {
+                    row = item.to_csv();
+                    // записать в файл
+                }
+                // добавить в БД
+                break;
+        }
     }
 
     public static Integer select_menu()
@@ -298,7 +353,7 @@ public class CustomerApplication {
         return customer.orElseThrow(NonExistentCustomerException::new);
     }
     
-    public static Collection<Customer> getAllCustomers() {
+    public static Collection<Tr_type> getAllTr_types() {
         return CUSTOMER_DAO.getAll();
     }
     public static void updateCustomer(Customer customer) {

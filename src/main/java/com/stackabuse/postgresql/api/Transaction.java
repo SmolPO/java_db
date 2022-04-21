@@ -9,6 +9,14 @@ public class Transaction {
     private Integer amount;
     private Integer term_id;
 
+    public Transaction(String[] data) {
+        this.customer_id = Integer.parseInt(data[0]);
+        this.tr_datetime = data[1];
+        this.mcc_code = Integer.parseInt(data[2]);
+        this.tr_type = Integer.parseInt(data[3]);
+        this.amount = Integer.parseInt(data[4]);
+        this.term_id = Integer.parseInt(data[5]);
+    }
     public Transaction(Integer customer_id,
                       String tr_datetime,
                       Integer mcc_code,
@@ -21,7 +29,6 @@ public class Transaction {
         this.tr_type = tr_type;
         this.amount = amount;
         this.term_id = term_id;
-
     }
     public int getCustomer_id() {
         return customer_id;
@@ -75,5 +82,11 @@ public class Transaction {
                 + ", amount=" + amount
                 + ", term_id=" + term_id
                 + ']';
+    }
+
+    public String to_csv() {
+        String res = String.format("%d,%s,%d,%d,%d,%d\n",
+                customer_id, tr_datetime, mcc_code, tr_type, amount, term_id);
+        return res;
     }
 }

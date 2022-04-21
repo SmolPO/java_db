@@ -7,6 +7,10 @@ public class MCC_code {
     private Integer mcc_code;
     private String mcc_description;
 
+    public MCC_code(String[] data) {
+        this.mcc_code = Integer.parseInt(data[0]);
+        this.mcc_description = mcc_description;
+    }
     public MCC_code(Integer mcc_code, String mcc_description) {
         this.mcc_code = mcc_code;
         this.mcc_description = mcc_description;
@@ -30,5 +34,10 @@ public class MCC_code {
         return "MCC_code["
                 + "mcc_description=" + mcc_description
                 + ']';
+    }
+    public String to_csv() {
+        String res = String.format("%d,%s\n",
+                mcc_code, mcc_description);
+        return res;
     }
 }

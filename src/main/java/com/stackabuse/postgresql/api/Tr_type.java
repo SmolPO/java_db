@@ -6,7 +6,10 @@ package com.stackabuse.postgresql.api;
 public class Tr_type {
     private Integer tr_type;
     private String tr_description;
-
+    public Tr_type(String[] data) {
+        this.tr_type = Integer.parseInt(data[0]);
+        this.tr_description = data[1];
+    }
     public Tr_type(Integer tr_type, String tr_description) {
         this.tr_type = tr_type;
         this.tr_description = tr_description;
@@ -31,5 +34,10 @@ public class Tr_type {
                 + "tr_type=" + tr_type
                 + " tr_description=" + tr_description
                 + ']';
+    }
+    public String to_csv() {
+        String res = String.format("%d,%s\n",
+                tr_type, tr_description);
+        return res;
     }
 }

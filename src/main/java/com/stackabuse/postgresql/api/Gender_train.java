@@ -4,6 +4,10 @@ public class Gender_train {
     private Integer customer_id;
     private Integer gender;
 
+    public Gender_train(String[] data) {
+        this.customer_id = Integer.parseInt(data[0]);
+        this.gender = Integer.parseInt(data[1]);
+    }
     public Gender_train(Integer customer_id, Integer gender) {
         this.customer_id = customer_id;
         this.gender = gender;
@@ -20,6 +24,12 @@ public class Gender_train {
     public String toString() {
         return "Gender_test["
                 + "customer_id=" + customer_id
+                + ", gender=" + gender
                 + ']';
+    }
+    public String to_csv() {
+        String res = String.format("%d,%s\n",
+                customer_id, gender);
+        return res;
     }
 }
