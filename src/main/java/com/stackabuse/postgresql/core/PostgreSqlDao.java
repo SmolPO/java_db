@@ -179,5 +179,4 @@ public class PostgreSqlDao implements Dao<Customer, Integer> {
             }
         });
     }
-
 }
