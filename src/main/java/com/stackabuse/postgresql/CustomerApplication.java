@@ -19,6 +19,13 @@ public class CustomerApplication {
     private static final Logger LOGGER = Logger.getLogger(CustomerApplication.class.getName());
     private static final Dao<Customer, Integer> CUSTOMER_DAO = new PostgreSqlDao();
 
+    private static final Dao<Transaction, Integer> TRANSACTION_DAO = new PostgreSqlDao();
+
+    private static final Dao<Tr_type, Integer> TR_TYPE_DAO = new PostgreSqlDao();
+
+    private static final Dao<MCC_code, Integer> MCC_CODE_DAO = new PostgreSqlDao();
+
+    private static final Dao<Gender_train, Integer> GENDER_TRAIN_DAO = new PostgreSqlDao();
     static String[] table_names  = new String[] {"table_1", "table_2", "table_3", "table_4"};
 
     public static boolean have_in_table(String table, String field, String val, String type)
@@ -88,6 +95,7 @@ public class CustomerApplication {
                 System.out.println("Введи описание кода");
                 descripion = in.nextLine();
                 MCC_code item = new MCC_code(code, descripion);
+                addMCCCode(item);
                 // запрос на обновление
                 break;
             case 2:
@@ -97,6 +105,7 @@ public class CustomerApplication {
                 System.out.println("Введи описание кода");
                 descripion = in.nextLine();
                 Tr_type type = new Tr_type(trans_id, descripion);
+                addTrType(type);
                 // запрос на обновление
                 break;
             case 3:
@@ -106,6 +115,7 @@ public class CustomerApplication {
                 System.out.println("Введи пол 1 - М, 2 - Ж");
                 Integer sex = in.nextInt();
                 Gender_train people = new Gender_train(people_id, sex);
+                addGender(people);
                 // запрос на обновление
                 break;
             case 4:
@@ -115,6 +125,7 @@ public class CustomerApplication {
                 // вывести на экран данные по транзакции
                 // Transaction trans = new Transaction();
                 // запрос на обновление
+                // addTransaction(trans);
                 break;
         }
     }
@@ -122,8 +133,21 @@ public class CustomerApplication {
     {
         Scanner in = new Scanner(System.in);
         Integer id = in.nextInt();
-        String cmd = "DELETE FROM " + table_names[table_id] + " WHERE id=" + id;
-        // запрос в БД
+        switch (table_id)
+        {
+            case 1:
+                deleteMCCCode(id);
+                break;
+            case 2:
+                deleteTrType(id);
+                break;
+            case 3:
+                deleteGender(id);
+                break;
+            case 4:
+                deleteTransaction(id);
+                break;
+        }
     }
     public static void update_note(Integer table_id)
     {
@@ -139,6 +163,7 @@ public class CustomerApplication {
                 System.out.println("Введи описание кода");
                 descripion = in.nextLine();
                 MCC_code item = new MCC_code(code, descripion);
+                updateMCCCode(item);
                 // запрос на обновление
                 break;
             case 2:
@@ -148,6 +173,7 @@ public class CustomerApplication {
                 System.out.println("Введи описание кода");
                 descripion = in.nextLine();
                 Tr_type type = new Tr_type(trans_id, descripion);
+                updateTrType(type);
                 // запрос на обновление
                 break;
             case 3:
@@ -157,7 +183,7 @@ public class CustomerApplication {
                 System.out.println("Введи пол 1 - М, 2 - Ж");
                 Integer sex = in.nextInt();
                 Gender_train people = new Gender_train(people_id, sex);
-                // запрос на обновление
+                updateGender(people);
                 break;
             case 4:
                 System.out.println("Введи код транзакции");
@@ -166,6 +192,7 @@ public class CustomerApplication {
                 // вывести на экран данные по транзакции
                 // Transaction trans = new Transaction();
                 // запрос на обновление
+                // updateTransaction(trans);
                 break;
         }
     }
@@ -190,64 +217,69 @@ public class CustomerApplication {
                 {
                     case 1:
                         Tr_type type = new Tr_type(data);
-                        // добавить в БД
+                        addTrType(type);
                         break;
                     case 2:
                         MCC_code mcc_code = new MCC_code(data);
-                        // добавить в БД
+                        addMCCCode(mcc_code);
                         break;
                     case 3:
                         Gender_train people = new Gender_train(data);
-                        // добавить в БД
+                        addGender(people);
                         break;
                     case 4:
                         Transaction trans = new Transaction(data);
-                        // добавить в БД
+                        addTransaction(trans);
                         break;
                 }
             }
             reader.close();
         }
     }
-    public static void save_db(Integer table)
-    {
+    public static void save_db(Integer table) throws IOException {
         String row;
+        FileWriter file;
         switch (table)
         {
             case 1:
                 Collection<Tr_type> list = getAllTr_types();
+                file = new FileWriter("tr_type_db.csv");
                 for (Tr_type item : list)
                 {
                     row = item.to_csv();
-                    // записать в файл
+                    file.write(row);
                 }
-                // добавить в БД
+                file.close();
                 break;
             case 2:
                 Collection<MCC_code> list = getAllMCC_codes();
+                file = new FileWriter("mcc_code_db.csv");
                 for (MCC_code item : list)
                 {
                     row = item.to_csv();
-                    // записать в файл
+                    file.write(row);
                 }
-                // добавить в БД
+                file.close();
                 break;
             case 3:
                 Collection<Gender_train> list = getAllGender_train();
+                file = new FileWriter("gender_train_db.csv");
                 for (Gender_train item : list)
                 {
                     row = item.to_csv();
-                    // записать в файл
+                    file.write(row);
                 }
+                file.close();
                 break;
             case 4:
                 Collection<Transaction> list = getAllTransaction();
+                file = new FileWriter("transaction_db.csv");
                 for (Transaction item : list)
                 {
                     row = item.to_csv();
-                    // записать в файл
+                    file.write(row);
                 }
-                // добавить в БД
+                file.close();
                 break;
         }
     }
@@ -354,15 +386,63 @@ public class CustomerApplication {
     }
     
     public static Collection<Tr_type> getAllTr_types() {
-        return CUSTOMER_DAO.getAll();
+        return TR_TYPE_DAO.getAll();
     }
+    public static Collection<Transaction> getAllTransaction() {
+        return TRANSACTION_DAO.getAll();
+    }
+    public static Collection<Gender_train> getAllGender_train() {
+        return GENDER_TRAIN_DAO.getAll();
+    }
+    public static Collection<MCC_code> getAllMCC_codes() {
+        return MCC_CODE_DAO.getAll();
+    }
+
     public static void updateCustomer(Customer customer) {
         CUSTOMER_DAO.update(customer);
     }
-    public static Optional<Integer> addCustomer(Customer customer) {
-        return CUSTOMER_DAO.save(customer);
+    public static void updateTrType(Tr_type item) {
+        TR_TYPE_DAO.update(item);
     }
+    public static void updateMCCCode(MCC_code item) {
+        MCC_CODE_DAO.update(item);
+    }
+    public static void updateGender(Gender_train item) {
+        GENDER_TRAIN_DAO.update(item);
+    }
+    public static void updateTransaction(Transaction item) {
+        TRANSACTION_DAO.update(item);
+    }
+
+    public static Optional<Integer> addCustomer(Customer item) {
+        return CUSTOMER_DAO.save(item);
+    }
+    public static Optional<Integer> addTrType(Tr_type item) {
+        return TR_TYPE_DAO.save(item);
+    }
+    public static Optional<Integer> addMCCCode(MCC_code item) {
+        return MCC_CODE_DAO.save(item);
+    }
+    public static Optional<Integer> addTransaction(Transaction item) {
+        return TRANSACTION_DAO.save(item);
+    }
+    public static Optional<Integer> addGender(Gender_train item) {
+        return GENDER_TRAIN_DAO.save(item);
+    }
+
     public static void deleteCustomer(Customer customer) {
         CUSTOMER_DAO.delete(customer);
     }
+    public static void deleteTrType(Tr_type item) {
+        TR_TYPE_DAO.delete(item);
+    }
+    public static void deleteGender(Gender_train item) {
+        GENDER_TRAIN_DAO.delete(item);
+    }
+    public static void deleteMCCCode(MCC_code item) {
+        MCC_CODE_DAO.delete(item);
+    }public static void deleteTransaction(Transaction item) {
+        TRANSACTION_DAO.delete(item);
+    }
+
 }
