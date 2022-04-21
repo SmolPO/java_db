@@ -55,15 +55,12 @@ public class CustomerApplication {
     public static Collection<Customer> getAllCustomers() {
         return CUSTOMER_DAO.getAll();
     }
-    
     public static void updateCustomer(Customer customer) {
         CUSTOMER_DAO.update(customer);
     }
-    
     public static Optional<Integer> addCustomer(Customer customer) {
         return CUSTOMER_DAO.save(customer);
     }
-    
     public static void deleteCustomer(Customer customer) {
         CUSTOMER_DAO.delete(customer);
     }
