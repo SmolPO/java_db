@@ -20,10 +20,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Hiram K. <https://github.com/IdelsTak>
- */
 public class PostgreSqlDao implements Dao<Customer, Integer> {
 
     private static final Logger LOGGER = Logger.getLogger(PostgreSqlDao.class.getName());

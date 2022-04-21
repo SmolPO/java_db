@@ -10,7 +10,6 @@ import java.util.Optional;
 
 public interface Dao<T, I> {
     Optional get(int id);
-    Optional get_gender(int id);
     Collection getAll();
     Optional save(T t);
     void update(T t);

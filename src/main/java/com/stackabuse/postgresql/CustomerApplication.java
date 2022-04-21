@@ -17,6 +17,7 @@ import java.io.IOException;
 
 public class CustomerApplication {
     private static final Logger LOGGER = Logger.getLogger(CustomerApplication.class.getName());
+
     private static final Dao<Customer, Integer> CUSTOMER_DAO = new PostgreSqlDao();
 
     private static final Dao<Transaction, Integer> TRANSACTION_DAO = new PostgreSqlDao();
@@ -242,9 +243,9 @@ public class CustomerApplication {
         switch (table)
         {
             case 1:
-                Collection<Tr_type> list = getAllTr_types();
+                Collection<Tr_type> list_1 = getAllTr_types();
                 file = new FileWriter("tr_type_db.csv");
-                for (Tr_type item : list)
+                for (Tr_type item : list_1)
                 {
                     row = item.to_csv();
                     file.write(row);
@@ -252,9 +253,9 @@ public class CustomerApplication {
                 file.close();
                 break;
             case 2:
-                Collection<MCC_code> list = getAllMCC_codes();
+                Collection<MCC_code> list_2 = getAllMCC_codes();
                 file = new FileWriter("mcc_code_db.csv");
-                for (MCC_code item : list)
+                for (MCC_code item : list_2)
                 {
                     row = item.to_csv();
                     file.write(row);
@@ -262,9 +263,9 @@ public class CustomerApplication {
                 file.close();
                 break;
             case 3:
-                Collection<Gender_train> list = getAllGender_train();
+                Collection<Gender_train> list_3 = getAllGender_train();
                 file = new FileWriter("gender_train_db.csv");
-                for (Gender_train item : list)
+                for (Gender_train item : list_3)
                 {
                     row = item.to_csv();
                     file.write(row);
@@ -272,9 +273,9 @@ public class CustomerApplication {
                 file.close();
                 break;
             case 4:
-                Collection<Transaction> list = getAllTransaction();
+                Collection<Transaction> list_4 = getAllTransaction();
                 file = new FileWriter("transaction_db.csv");
-                for (Transaction item : list)
+                for (Transaction item : list_4)
                 {
                     row = item.to_csv();
                     file.write(row);
@@ -324,7 +325,7 @@ public class CustomerApplication {
         }
         return n;
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         try {
             Customer customer = getCustomer(1);
         } catch (NonExistentEntityException ex) {
@@ -441,8 +442,8 @@ public class CustomerApplication {
     }
     public static void deleteMCCCode(MCC_code item) {
         MCC_CODE_DAO.delete(item);
-    }public static void deleteTransaction(Transaction item) {
+    }
+    public static void deleteTransaction(Transaction item) {
         TRANSACTION_DAO.delete(item);
     }
-
 }
