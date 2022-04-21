@@ -1,9 +1,8 @@
 package com.stackabuse.postgresql;
 import java.lang.reflect.Array;
 import java.util.Scanner;
-import com.stackabuse.postgresql.api.Customer;
-import com.stackabuse.postgresql.api.NonExistentEntityException;
-import com.stackabuse.postgresql.api.Transaction;
+
+import com.stackabuse.postgresql.api.*;
 import com.stackabuse.postgresql.core.NonExistentCustomerException;
 import com.stackabuse.postgresql.core.PostgreSqlDao;
 import com.stackabuse.postgresql.spi.Dao;
@@ -11,15 +10,16 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.HashMap;
-import java.util.Map;
-/**
- *
- * @author Hiram K. <https://github.com/IdelsTak>
- */
+import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class CustomerApplication {
     private static final Logger LOGGER = Logger.getLogger(CustomerApplication.class.getName());
     private static final Dao<Customer, Integer> CUSTOMER_DAO = new PostgreSqlDao();
+
+    static String[] table_names  = new String[] {"table_1", "table_2", "table_3", "table_4"};
 
     public static boolean have_in_table(String table, String field, String val, String type)
     {
@@ -35,11 +35,6 @@ public class CustomerApplication {
     }
     public static String select_table()
     {
-        String[] table_names = new String[4];
-        table_names[0] = "table_1";
-        table_names[1] = "table_2";
-        table_names[2] = "table_3";
-        table_names[3] = "table_4";
         Scanner in = new Scanner(System.in);
         // меню
         System.out.println("Меню");
@@ -62,14 +57,12 @@ public class CustomerApplication {
         }
         return table_names[n];
     }
-    ///////////////
-
     public static Integer input_int(String table, String field, String type)
     {
         String buff = "";
         Scanner in = new Scanner(System.in);
         boolean check = false;
-        System.out.println("Введите id работника");
+        System.out.println("Введите id");
         while (!check) {
             buff = in.nextLine();
             check = have_in_table(table, field, buff, "int");
@@ -80,100 +73,126 @@ public class CustomerApplication {
         Integer result = Integer.parseInt(buff);
         return result;
     }
-    public static void add_trans()
-    {
-        // добавить транзакция
-    }
-    public static Transaction get_trans()
-    {
-        // получить транзакцию
-        Transaction trans = new Transaction(); // get
-        return trans;
-    }
-    public static void update_trans()
-    {
-        // получить транзакцию
 
-    }
-    public static void kill_trans()
+    public static void add_note(Integer table_id)
     {
+        Scanner in = new Scanner(System.in);
+        String descripion;
+        Integer trans_id;
+        switch (table_id)
+        {
+            case 1:
+                System.out.println("Введи код МСС");
+                Integer code = in.nextInt();
+                // проверка, что id есть в базе
+                System.out.println("Введи описание кода");
+                descripion = in.nextLine();
+                MCC_code item = new MCC_code(code, descripion);
+                // запрос на обновление
+                break;
+            case 2:
+                System.out.println("Введи код типа транзакции");
+                trans_id = in.nextInt();
+                // проверка, что id есть в базе
+                System.out.println("Введи описание кода");
+                descripion = in.nextLine();
+                Tr_type type = new Tr_type(trans_id, descripion);
+                // запрос на обновление
+                break;
+            case 3:
+                System.out.println("Введи код клиента");
+                Integer people_id = in.nextInt();
+                // проверка, что id есть в базе
+                System.out.println("Введи пол 1 - М, 2 - Ж");
+                Integer sex = in.nextInt();
+                Gender_train people = new Gender_train(people_id, sex);
+                // запрос на обновление
+                break;
+            case 4:
+                System.out.println("Введи код транзакции");
+                trans_id = in.nextInt();
+                // проверка, что id есть в базе
+                // вывести на экран данные по транзакции
+                // Transaction trans = new Transaction();
+                // запрос на обновление
+                break;
+        }
+    }
+    public static void delete_note(Integer table_id)
+    {
+        Scanner in = new Scanner(System.in);
+        Integer id = in.nextInt();
+        String cmd = "DELETE FROM " + table_names[table_id] + " WHERE id=" + id;
+        // запрос в БД
+    }
+    public static void update_note(Integer table_id)
+    {
+        Scanner in = new Scanner(System.in);
+        String descripion;
+        Integer trans_id;
+        switch (table_id)
+        {
+            case 1:
+                System.out.println("Введи код МСС");
+                Integer code = in.nextInt();
+                // проверка, что id есть в базе
+                System.out.println("Введи описание кода");
+                descripion = in.nextLine();
+                MCC_code item = new MCC_code(code, descripion);
+                // запрос на обновление
+                break;
+            case 2:
+                System.out.println("Введи код типа транзакции");
+                trans_id = in.nextInt();
+                // проверка, что id есть в базе
+                System.out.println("Введи описание кода");
+                descripion = in.nextLine();
+                Tr_type type = new Tr_type(trans_id, descripion);
+                // запрос на обновление
+                break;
+            case 3:
+                System.out.println("Введи код клиента");
+                Integer people_id = in.nextInt();
+                // проверка, что id есть в базе
+                System.out.println("Введи пол 1 - М, 2 - Ж");
+                Integer sex = in.nextInt();
+                Gender_train people = new Gender_train(people_id, sex);
+                // запрос на обновление
+                break;
+            case 4:
+                System.out.println("Введи код транзакции");
+                trans_id = in.nextInt();
+                // проверка, что id есть в базе
+                // вывести на экран данные по транзакции
+                // Transaction trans = new Transaction();
+                // запрос на обновление
+                break;
+        }
+    }
+    public static void get_note(Integer table_id)
+    {
+        Scanner in = new Scanner(System.in);
+        System.out.println("Введите id записи");
+        Integer id = in.nextInt();
+        String cmd = "SELECT * FROM " + table_names[table_id] + " WHERE id=" + id;
+        // запрос в БД
+    }
+    public static void load_db(Integer table) throws IOException {
+        String path = "";
+        String row = "";
+        System.out.println("Введите путь к файлу");
+        File file = new File(path);
+        BufferedReader reader = new BufferedReader(new FileReader(path));
+        if (file.isFile()) {
+            while ((row = reader.readLine()) != null) {
+                String[] data = row.split(",");
 
+                // do something with the data
+            }
+            reader.close();
+        }
     }
-
-    public static void load_trans()
-    {
-
-    }
-    public static void save_trans()
-    {
-
-    }
-    /////////
-    public static void set_gender()
-    {
-
-    }
-
-    public static int get_gender()
-    {
-        return 0;
-    }
-    /////////////
-    public static void get_mcc()
-    {
-        // добавить транзакция
-    }
-    public static void add_mcc()
-    {
-        // добавить транзакция
-    }
-    public static void kill_mcc()
-    {
-        // добавить транзакция
-    }
-    public static void update_mcc()
-    {
-        // добавить транзакция
-    }
-    public static int set_mcc()
-    {
-        // добавить транзакция
-        return 0;
-    }
-    public static void set_mcc_description(int code)
-    {
-        // добавить транзакция
-    }
-    public static void load_mcc()
-    {
-
-    }
-    public static void save_mcc()
-    {
-
-    }
-
-    public static void add_people()
-    {
-
-    }
-    public static void kill_people()
-    {
-
-    }
-    public static void update_people()
-    {
-
-    }
-    public static void get_people()
-    {
-
-    }
-    public static void load_people()
-    {
-
-    }
-    public static void save_people()
+    public static void save_db(Integer table)
     {
 
     }
@@ -183,24 +202,13 @@ public class CustomerApplication {
         Scanner in = new Scanner(System.in);
         // меню
         System.out.println("Меню");
-        System.out.println("Выберите действие (первая цифра номер таблицы, вторая - номер действия");
+        System.out.println("Выберите таблицу");
         System.out.println("Таблицы");
         System.out.println("1 - таблица Транзакций");
         System.out.println("2 - таблица Кодов МСС");
-        System.out.println("3 - таблица Сотрудников");
-        System.out.println("4 - таблица Сотрудников");
-        System.out.println("5 - таблица Отчет");
-        System.out.println("Действия");
-        System.out.println("1. Добавить");
-        System.out.println("2. Удалить по id");
-        System.out.println("3. Изменить по id");
-        System.out.println("4. Получить по id");
-        System.out.println("5. Загрузить из файла");
-        System.out.println("6. Сохранить в файл");
-        System.out.println("7. Запрос 1");
-        System.out.println("8. Запрос 2");
-        System.out.println("9  Запрос 3");
-        System.out.println("0. Запрос 4");
+        System.out.println("3 - таблица Типы транзакций");
+        System.out.println("4 - таблица Пол клиентов");
+        System.out.println("5 - Отчет");
         String menu = "";
         Integer n = 0;
         while(true) {
@@ -209,7 +217,26 @@ public class CustomerApplication {
         }
         return n;
     }
-    ///////////////
+
+    public static Integer select_point()
+    {
+        Scanner in = new Scanner(System.in);
+        System.out.println("Выберите дейтвие");
+        System.out.println("Таблицы");
+        System.out.println("1 - Добавить запись");
+        System.out.println("2 - Удалить запись");
+        System.out.println("3 - Изменить запись");
+        System.out.println("4 - Получить запись");
+        System.out.println("5 - Сохранить БД");
+        System.out.println("6 - Загрузить БД");
+        String menu = "";
+        Integer n = 0;
+        while(true) {
+            n = in.nextInt();
+            break;
+        }
+        return n;
+    }
     public static void main(String[] args) {
         try {
             Customer customer = getCustomer(1);
@@ -217,100 +244,39 @@ public class CustomerApplication {
             LOGGER.log(Level.WARNING, ex.getMessage());
         }
         while(true) {
-            Integer menu = select_menu();
-            System.out.println("1. Добавить");
-            System.out.println("2. Удалить по id");
-            System.out.println("3. Изменить по id");
-            System.out.println("4. Получить по id");
-            System.out.println("5. Загрузить из файла");
-            System.out.println("6. Сохранить в файл");
-            System.out.println("7. Изменить пол");
-            System.out.println("8. Узнать пол");
-            System.out.println("9. Запрос 1");
-            System.out.println("10. Запрос 2");
-            System.out.println("11. Запрос 3");
-            System.out.println("12. Запрос 4");
-            System.out.println("0. Выход");
-            switch (menu)
+            Integer table_id = select_menu();
+            if (table_id == 5)
             {
-                case 11:
-                    add_trans();
+                // report
+            }
+            Integer point = select_point();
+            switch (point)
+            {
+                case 1:
+                    add_note(table_id);
                     break;
-                case 12:
-                    kill_trans();
+                case 2:
+                    delete_note(table_id);
                     break;
-                case 13:
-                    update_trans();
+                case 3:
+                    get_note(table_id);
                     break;
-                case 14:
-                    get_trans();
+                case 4:
+                    update_note(table_id);
                     break;
-                case 15:
-                    load_trans();
+                case 5:
+                   // load_db(table_id);
                     break;
-                case 16:
-                    save_trans();
+                case 6:
+                    save_db(table_id);
                     break;
-                case 21:
-                    add_mcc();
-                    break;
-                case 22:
-                    kill_mcc();
-                    break;
-                case 23:
-                    update_mcc();;
-                    break;
-                case 24:
-                    get_mcc();
-                    break;
-                case 25:
-                    load_mcc();
-                    break;
-                case 26:
-                    save_mcc();
-                    break;
-                case 31:
-                    add_people();
-                    break;
-                case 32:
-                    kill_people();
-                    break;
-                case 33:
-                    update_people();
-                    break;
-                case 34:
-                    get_people();
-                    break;
-                case 35:
-                    load_people();
-                    break;
-                case 36:
-                    save_people();
-                    break;
-                case 47:
-                    //
-                    break;
-                case 48:
-                    //
-                    break;
-                case 49:
-                    //
-                    break;
-                case 40:
-                    //
-                    break;
-                case 0:
-                    save_people();
-                    save_trans();
-                    save_mcc();
-                    return;
                 default:
                     System.out.println("Некорректный ввод");
             }
-            break;
         }
+
         //Test whether a customer can be added to the database
-        Customer firstCustomer = new Customer("Manuel", "Kelley", "ManuelMKelley@jourrapide.com");
+       /*Customer firstCustomer = new Customer("Manuel", "Kelley", "ManuelMKelley@jourrapide.com");
         Customer secondCustomer = new Customer("Joshua", "Daulton", "JoshuaMDaulton@teleworm.us");
         Customer thirdCustomer = new Customer("April", "Ellis", "AprilMellis@jourrapide.com");
         addCustomer(firstCustomer).ifPresent(firstCustomer::setId);
@@ -324,7 +290,7 @@ public class CustomerApplication {
         //Test whether all customers can be read from database
         getAllCustomers().forEach(System.out::println);
         //Test whether a customer can be deleted
-        deleteCustomer(secondCustomer);
+        deleteCustomer(secondCustomer);*/
     }
     
     public static Customer getCustomer(int id) throws NonExistentEntityException {
