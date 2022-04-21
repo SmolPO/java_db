@@ -4,8 +4,9 @@ public class Gender_train {
     private Integer customer_id;
     private Integer gender;
 
-    public Gender_train(Integer customer_id) {
+    public Gender_train(Integer customer_id, Integer gender) {
         this.customer_id = customer_id;
+        this.gender = gender;
     }
 
     public int getCustomer_id() {
