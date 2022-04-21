@@ -1,9 +1,9 @@
 package com.stackabuse.postgresql.api;
 // interval	axis reading
-public class BFS {
+public class Gender_test_KSS {
     private Integer customer_id;
     private float probability;
-    public BFS(Integer customer_id, float probability) {
+    public Gender_test_KSS(Integer customer_id, float probability) {
         this.customer_id = customer_id;
         this.probability = probability;
     }
@@ -19,7 +19,7 @@ public class BFS {
     }
     @Override
     public String toString() {
-        return "BFS["
+        return "Gender_test_KSS["
                 + "customer_id=" + customer_id
                 + ", probability=" + probability
                 + ']';
