@@ -1,10 +1,13 @@
 package com.stackabuse.postgresql;
-import java.lang.reflect.Array;
 import java.util.Scanner;
 
 import com.stackabuse.postgresql.api.*;
 import com.stackabuse.postgresql.core.NonExistentCustomerException;
-import com.stackabuse.postgresql.core.PostgreSqlDao;
+import com.stackabuse.postgresql.core.CustomerDao;
+import com.stackabuse.postgresql.core.TransDao;
+import com.stackabuse.postgresql.core.TypesDao;
+import com.stackabuse.postgresql.core.GenderDao;
+import com.stackabuse.postgresql.core.MCCDao;
 import com.stackabuse.postgresql.spi.Dao;
 import java.util.Collection;
 import java.util.Optional;
@@ -18,15 +21,13 @@ import java.io.IOException;
 public class CustomerApplication {
     private static final Logger LOGGER = Logger.getLogger(CustomerApplication.class.getName());
 
-    private static final Dao<Customer, Integer> CUSTOMER_DAO = new PostgreSqlDao();
+    private static final Dao<Customer, Integer> CUSTOMER_DAO = new CustomerDao();
 
-    private static final Dao<Transaction, Integer> TRANSACTION_DAO = new PostgreSqlDao();
+    private static final Dao<Trans, Integer> TRANS_DAO = new TransDao();
 
-    private static final Dao<Tr_type, Integer> TR_TYPE_DAO = new PostgreSqlDao();
-
-    private static final Dao<MCC_code, Integer> MCC_CODE_DAO = new PostgreSqlDao();
-
-    private static final Dao<Gender_train, Integer> GENDER_TRAIN_DAO = new PostgreSqlDao();
+    private static final Dao<MCC_code, Integer> MCC_DAO = new MCCDao();
+    private static final Dao<Gender_train, Integer> GENDER_DAO = new GenderDao();
+    private static final Dao<Tr_type, Integer> TYPE_DAO = new TypesDao();
     static String[] table_names  = new String[] {"table_1", "table_2", "table_3", "table_4"};
 
     public static boolean have_in_table(String table, String field, String val, String type)
@@ -130,23 +131,27 @@ public class CustomerApplication {
                 break;
         }
     }
-    public static void delete_note(Integer table_id)
-    {
+    public static void delete_note(Integer table_id) throws NonExistentEntityException {
         Scanner in = new Scanner(System.in);
         Integer id = in.nextInt();
+        Object item;
         switch (table_id)
         {
             case 1:
-                deleteMCCCode(id);
+                item = getMCC(id);
+                deleteMCCCode((MCC_code)item);
                 break;
             case 2:
-                deleteTrType(id);
+                item = getType(id);
+                deleteTrType((Tr_type) item);
                 break;
             case 3:
-                deleteGender(id);
+                item = getGender(id);
+                deleteGender((Gender_train) item);
                 break;
             case 4:
-                deleteTransaction(id);
+                item = getTrans(id);
+                deleteTransaction((Trans) item);
                 break;
         }
     }
@@ -229,7 +234,7 @@ public class CustomerApplication {
                         addGender(people);
                         break;
                     case 4:
-                        Transaction trans = new Transaction(data);
+                        Trans trans = new Trans(data);
                         addTransaction(trans);
                         break;
                 }
@@ -273,9 +278,9 @@ public class CustomerApplication {
                 file.close();
                 break;
             case 4:
-                Collection<Transaction> list_4 = getAllTransaction();
+                Collection<Trans> list_4 = getAllTransaction();
                 file = new FileWriter("transaction_db.csv");
-                for (Transaction item : list_4)
+                for (Trans item : list_4)
                 {
                     row = item.to_csv();
                     file.write(row);
@@ -325,7 +330,7 @@ public class CustomerApplication {
         }
         return n;
     }
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NonExistentEntityException {
         try {
             Customer customer = getCustomer(1);
         } catch (NonExistentEntityException ex) {
@@ -385,65 +390,84 @@ public class CustomerApplication {
         Optional<Customer> customer = CUSTOMER_DAO.get(id);
         return customer.orElseThrow(NonExistentCustomerException::new);
     }
-    
-    public static Collection<Tr_type> getAllTr_types() {
-        return TR_TYPE_DAO.getAll();
+
+    public static Trans getTrans(int id) throws NonExistentEntityException {
+        Optional<Trans> item = TRANS_DAO.get(id);
+        return item.orElseThrow(NonExistentCustomerException::new);
     }
-    public static Collection<Transaction> getAllTransaction() {
-        return TRANSACTION_DAO.getAll();
+    public static MCC_code getMCC(int id) throws NonExistentEntityException {
+        Optional<MCC_code> item = MCC_DAO.get(id);
+        return item.orElseThrow(NonExistentCustomerException::new);
+    }
+    public static Tr_type getType(int id) throws NonExistentEntityException {
+        Optional<Tr_type> item = TYPE_DAO.get(id);
+        return item.orElseThrow(NonExistentCustomerException::new);
+    }
+    public static Gender_train getGender(int id) throws NonExistentEntityException {
+        Optional<Gender_train> item = GENDER_DAO.get(id);
+        return item.orElseThrow(NonExistentCustomerException::new);
+    }
+
+    ///////////////////////////////////////////
+    public static Collection<Tr_type> getAllTr_types() {
+        return TYPE_DAO.getAll();
+    }
+    public static Collection<Trans> getAllTransaction() {
+        return TRANS_DAO.getAll();
     }
     public static Collection<Gender_train> getAllGender_train() {
-        return GENDER_TRAIN_DAO.getAll();
+        return GENDER_DAO.getAll();
     }
     public static Collection<MCC_code> getAllMCC_codes() {
-        return MCC_CODE_DAO.getAll();
+        return MCC_DAO.getAll();
     }
 
     public static void updateCustomer(Customer customer) {
         CUSTOMER_DAO.update(customer);
     }
+    ////////////////////////////////////
     public static void updateTrType(Tr_type item) {
-        TR_TYPE_DAO.update(item);
+        TYPE_DAO.update(item);
     }
     public static void updateMCCCode(MCC_code item) {
-        MCC_CODE_DAO.update(item);
+        MCC_DAO.update(item);
     }
     public static void updateGender(Gender_train item) {
-        GENDER_TRAIN_DAO.update(item);
+        GENDER_DAO.update(item);
     }
-    public static void updateTransaction(Transaction item) {
-        TRANSACTION_DAO.update(item);
+    public static void updateTransaction(Trans item) {
+        TRANS_DAO.update(item);
     }
-
+    ////////////////////////////////////
     public static Optional<Integer> addCustomer(Customer item) {
         return CUSTOMER_DAO.save(item);
     }
     public static Optional<Integer> addTrType(Tr_type item) {
-        return TR_TYPE_DAO.save(item);
+        return TYPE_DAO.save(item);
     }
     public static Optional<Integer> addMCCCode(MCC_code item) {
-        return MCC_CODE_DAO.save(item);
+        return MCC_DAO.save(item);
     }
-    public static Optional<Integer> addTransaction(Transaction item) {
-        return TRANSACTION_DAO.save(item);
+    public static Optional<Integer> addTransaction(Trans item) {
+        return TRANS_DAO.save(item);
     }
+    ////////////////////////////////////
     public static Optional<Integer> addGender(Gender_train item) {
-        return GENDER_TRAIN_DAO.save(item);
+        return GENDER_DAO.save(item);
     }
-
     public static void deleteCustomer(Customer customer) {
         CUSTOMER_DAO.delete(customer);
     }
     public static void deleteTrType(Tr_type item) {
-        TR_TYPE_DAO.delete(item);
+        TYPE_DAO.delete(item);
     }
     public static void deleteGender(Gender_train item) {
-        GENDER_TRAIN_DAO.delete(item);
+        GENDER_DAO.delete(item);
     }
     public static void deleteMCCCode(MCC_code item) {
-        MCC_CODE_DAO.delete(item);
+        MCC_DAO.delete(item);
     }
-    public static void deleteTransaction(Transaction item) {
-        TRANSACTION_DAO.delete(item);
+    public static void deleteTransaction(Trans item) {
+        TRANS_DAO.delete(item);
     }
 }

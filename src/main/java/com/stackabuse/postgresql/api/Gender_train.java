@@ -20,6 +20,13 @@ public class Gender_train {
         this.customer_id = customer_id;
     }
 
+    public int getGender() {
+        return gender;
+    }
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
     @Override
     public String toString() {
         return "Gender_test["

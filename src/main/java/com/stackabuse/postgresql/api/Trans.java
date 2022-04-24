@@ -1,7 +1,7 @@
 package com.stackabuse.postgresql.api;
 // Таблица transactions.csv
 // customer_id,tr_datetime,mcc_code,tr_type,amount,term_id
-public class Transaction {
+public class Trans {
     private Integer customer_id;
     private String tr_datetime;
     private Integer mcc_code;
@@ -9,7 +9,7 @@ public class Transaction {
     private Integer amount;
     private Integer term_id;
 
-    public Transaction(String[] data) {
+    public Trans(String[] data) {
         this.customer_id = Integer.parseInt(data[0]);
         this.tr_datetime = data[1];
         this.mcc_code = Integer.parseInt(data[2]);
@@ -17,12 +17,12 @@ public class Transaction {
         this.amount = Integer.parseInt(data[4]);
         this.term_id = Integer.parseInt(data[5]);
     }
-    public Transaction(Integer customer_id,
-                      String tr_datetime,
-                      Integer mcc_code,
-                      Integer tr_type,
-                      Integer amount,
-                      Integer term_id) {
+    public Trans(Integer customer_id,
+                 String tr_datetime,
+                 Integer mcc_code,
+                 Integer tr_type,
+                 Integer amount,
+                 Integer term_id) {
         this.customer_id = customer_id;
         this.tr_datetime = tr_datetime;
         this.mcc_code = mcc_code;

@@ -6,7 +6,6 @@
 package com.stackabuse.postgresql.core;
 
 import com.stackabuse.postgresql.api.Customer;
-import com.stackabuse.postgresql.api.Gender_train;
 import com.stackabuse.postgresql.spi.Dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,12 +19,12 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PostgreSqlDao implements Dao<Customer, Integer> {
+public class CustomerDao implements Dao<Customer, Integer> {
 
-    private static final Logger LOGGER = Logger.getLogger(PostgreSqlDao.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CustomerDao.class.getName());
     private final Optional<Connection> connection;
 
-    public PostgreSqlDao() {
+    public CustomerDao() {
         this.connection = JdbcConnection.getConnection();
     }
 
@@ -52,30 +51,6 @@ public class PostgreSqlDao implements Dao<Customer, Integer> {
             }
 
             return customer;
-        });
-    }
-
-    @Override
-    public Optional get_gender(int id) {
-        return connection.flatMap(conn -> {
-            Optional<Gender_train> gender_train = Optional.empty();
-            String sql = "SELECT * FROM gender_train WHERE customer_id = " + id;
-
-            try (Statement statement = conn.createStatement();
-                 ResultSet resultSet = statement.executeQuery(sql)) {
-
-                if (resultSet.next()) {
-                    Integer customer_id =  Integer.parseInt(resultSet.getString("customer_id"));
-                    Integer gender = Integer.parseInt(resultSet.getString("gender"));
-
-                    gender_train = Optional.of(new Gender_train(customer_id, gender));
-
-                    LOGGER.log(Level.INFO, "Found {0} in database", gender_train.get());
-                }
-            } catch (SQLException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
-            return gender_train;
         });
     }
 

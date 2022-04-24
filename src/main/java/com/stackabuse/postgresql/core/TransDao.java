@@ -5,9 +5,8 @@
  */
 package com.stackabuse.postgresql.core;
 
-import com.stackabuse.postgresql.api.Transaction;
+import com.stackabuse.postgresql.api.Trans;
 import com.stackabuse.postgresql.api.Gender_train;
-import com.stackabuse.postgresql.api.Transaction;
 import com.stackabuse.postgresql.spi.Dao;
 
 import java.sql.*;
@@ -18,7 +17,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TransDao implements Dao<Transaction, Integer> {
+
+public class TransDao implements Dao<Trans, Integer> {
 
     private static final Logger LOGGER = Logger.getLogger(TransDao.class.getName());
     private final Optional<Connection> connection;
@@ -30,8 +30,8 @@ public class TransDao implements Dao<Transaction, Integer> {
     @Override
     public Optional get(int id) {
         return connection.flatMap(conn -> {
-            Optional<Transaction> trans = Optional.empty();
-            String sql = "SELECT * FROM transaction WHERE id = " + id;
+            Optional<Trans> item = Optional.empty();
+            String sql = "SELECT * FROM transactions WHERE id = " + id;
 
             try (Statement statement = conn.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql)) {
@@ -44,21 +44,21 @@ public class TransDao implements Dao<Transaction, Integer> {
                     Integer amount = resultSet.getInt("amount");
                     Integer term_id = resultSet.getInt("term_id");
 
-                    trans = Optional.of(new Transaction(Transaction_id, 
+                    item = Optional.of(new Trans(Transaction_id,
                             tr_datetime, mcc_code, tr_type, amount, term_id));
 
-                    LOGGER.log(Level.INFO, "Found {0} in database", trans.get());
+                    LOGGER.log(Level.INFO, "Found {0} in database", item.get());
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
-            return trans;
+            return item;
         });
     }
     
     @Override
-    public Collection<Transaction> getAll() {
-        Collection<Transaction> Transactions = new ArrayList<>();
+    public Collection<Trans> getAll() {
+        Collection<Trans> list = new ArrayList<>();
         String sql = "SELECT * FROM Transaction";
 
         connection.ifPresent(conn -> {
@@ -73,12 +73,12 @@ public class TransDao implements Dao<Transaction, Integer> {
                     Integer amount = resultSet.getInt("amount");
                     Integer term_id = resultSet.getInt("term_id");
 
-                    Transaction trans = new Transaction(Transaction_id,
+                    Trans item = new Trans(Transaction_id,
                             tr_datetime, mcc_code, tr_type, amount, term_id);
 
-                    Transactions.add(trans);
+                    list.add(item);
 
-                    LOGGER.log(Level.INFO, "Found {0} in database", trans);
+                    LOGGER.log(Level.INFO, "Found {0} in database", item);
                 }
 
             } catch (SQLException ex) {
@@ -86,16 +86,20 @@ public class TransDao implements Dao<Transaction, Integer> {
             }
         });
 
-        return Transactions;
+        return list;
     }
 
     @Override
-    public Optional<Integer> save(Transaction Transaction) {
+    public Optional<Integer> save(Trans item) {
         String message = "The Transaction to be added should not be null";
-        Transaction nonNullTransaction = Objects.requireNonNull(Transaction, message);
+        Trans nonNullTransaction = Objects.requireNonNull(item, message);
         String sql = "INSERT INTO "
-                + "Transaction(first_name, last_name, email) "
-                + "VALUES(?, ?, ?)";
+                + "SET "
+                + "first_name = ?, "
+                + "last_name = ?, "
+                + "email = ? "
+                + "WHERE "
+                + "Transaction_id = ?";
 
         return connection.flatMap(conn -> {
             Optional<Integer> generatedId = Optional.empty();
@@ -103,9 +107,12 @@ public class TransDao implements Dao<Transaction, Integer> {
             try (PreparedStatement statement = conn.prepareStatement(sql,
                     Statement.RETURN_GENERATED_KEYS)) {
 
-                statement.setString(1, nonNullTransaction.getFirstName());
-                statement.setString(2, nonNullTransaction.getLastName());
-                statement.setString(3, nonNullTransaction.getEmail());
+                statement.setInt(1, nonNullTransaction.getCustomer_id());
+                statement.setString(2, nonNullTransaction.getTr_datetime());
+                statement.setInt(3, nonNullTransaction.getMcc_code());
+                statement.setInt(4, nonNullTransaction.getTr_type());
+                statement.setInt(5, nonNullTransaction.getAmount());
+                statement.setInt(6, nonNullTransaction.getTerm_id());
 
                 int numberOfInsertedRows = statement.executeUpdate();
 
@@ -129,9 +136,9 @@ public class TransDao implements Dao<Transaction, Integer> {
     }
 
     @Override
-    public void update(Transaction Transaction) {
+    public void update(Trans item) {
         String message = "The Transaction to be updated should not be null";
-        Transaction nonNullTransaction = Objects.requireNonNull(Transaction, message);
+        Trans nonNullTransaction = Objects.requireNonNull(item, message);
         String sql = "UPDATE Transaction "
                 + "SET "
                 + "first_name = ?, "
@@ -143,10 +150,12 @@ public class TransDao implements Dao<Transaction, Integer> {
         connection.ifPresent(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
-                statement.setString(1, nonNullTransaction.getFirstName());
-                statement.setString(2, nonNullTransaction.getLastName());
-                statement.setString(3, nonNullTransaction.getEmail());
-                statement.setInt(4, nonNullTransaction.getId());
+                statement.setInt(1, nonNullTransaction.getCustomer_id());
+                statement.setString(2, nonNullTransaction.getTr_datetime());
+                statement.setInt(3, nonNullTransaction.getMcc_code());
+                statement.setInt(4, nonNullTransaction.getTr_type());
+                statement.setInt(5, nonNullTransaction.getAmount());
+                statement.setInt(6, nonNullTransaction.getTerm_id());
 
                 int numberOfUpdatedRows = statement.executeUpdate();
 
@@ -160,15 +169,20 @@ public class TransDao implements Dao<Transaction, Integer> {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Trans item) {
         String message = "The Transaction to be deleted should not be null";
-        Transaction nonNullTransaction = Objects.requireNonNull(Transaction, message);
+        Trans nonNullTransaction = Objects.requireNonNull(item, message);
         String sql = "DELETE FROM Transaction WHERE id = ?";
 
         connection.ifPresent(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
-                statement.setInt(1, nonNullTransaction.getId());
+                statement.setInt(1, nonNullTransaction.getCustomer_id());
+                statement.setString(2, nonNullTransaction.getTr_datetime());
+                statement.setInt(3, nonNullTransaction.getMcc_code());
+                statement.setInt(4, nonNullTransaction.getTr_type());
+                statement.setInt(5, nonNullTransaction.getAmount());
+                statement.setInt(6, nonNullTransaction.getTerm_id());
 
                 int numberOfDeletedRows = statement.executeUpdate();
 
