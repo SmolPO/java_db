@@ -358,7 +358,7 @@ public class CustomerApplication {
                     update_note(table_id);
                     break;
                 case 5:
-                   // load_db(table_id);
+                    load_db(table_id);
                     break;
                 case 6:
                     save_db(table_id);

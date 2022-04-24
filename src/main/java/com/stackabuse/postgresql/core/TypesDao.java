@@ -18,8 +18,9 @@ import java.util.logging.Logger;
 
 
 public class TypesDao implements Dao<Tr_type, Integer>   {
-        private static final Logger LOGGER = Logger.getLogger(Tr_type.class.getName());
-        private final Optional<Connection> connection;
+    private static final Logger LOGGER = Logger.getLogger(Tr_type.class.getName());
+    private final Optional<Connection> connection;
+    private String name_table = "types";
 
     public TypesDao() {
         this.connection = JdbcConnection.getConnection();
@@ -29,7 +30,7 @@ public class TypesDao implements Dao<Tr_type, Integer>   {
         public Optional get(int id) {
         return connection.flatMap(conn -> {
             Optional<Tr_type> item = Optional.empty();
-            String sql = "SELECT * FROM genders WHERE id = " + id;
+            String sql = "SELECT * FROM " + name_table + " WHERE tr_type=" + id;
 
             try (Statement statement = conn.createStatement();
                  ResultSet resultSet = statement.executeQuery(sql)) {
@@ -51,7 +52,7 @@ public class TypesDao implements Dao<Tr_type, Integer>   {
         @Override
         public Collection<Tr_type> getAll() {
         Collection<Tr_type> list = new ArrayList<>();
-        String sql = "SELECT * FROM Tr_typeaction";
+        String sql = "SELECT * FROM " + name_table + ";";
 
         connection.ifPresent(conn -> {
             try (Statement statement = conn.createStatement();
@@ -81,6 +82,7 @@ public class TypesDao implements Dao<Tr_type, Integer>   {
         String message = "The Tr_typeaction to be added should not be null";
         Tr_type nonNullTr_typeaction = Objects.requireNonNull(item, message);
         String sql = "INSERT INTO "
+                + name_table
                 + "SET "
                 + "tr_type = ?, "
                 + "tr_description = ?";
@@ -117,18 +119,22 @@ public class TypesDao implements Dao<Tr_type, Integer>   {
 
         @Override
         public void update(Tr_type item) {
-        String message = "The Tr_typeaction to be updated should not be null";
+        String message = "The Tr_type action to be updated should not be null";
         Tr_type nonNullTr_typeaction = Objects.requireNonNull(item, message);
-        String sql = "UPDATE Tr_type "
+        String sql = "UPDATE "
+                + name_table
                 + "SET "
-                + "customer_id = ?, "
-                + "gender = ?";
+                + "tr_type = ?, "
+                + "gender = ? "
+                + "WHERE "
+                + "tr_type= ?;";
 
         connection.ifPresent(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
                 statement.setInt(1, nonNullTr_typeaction.getTr_type());
                 statement.setString(2, nonNullTr_typeaction.getTr_description());
+                statement.setInt(3, nonNullTr_typeaction.getTr_type());
 
                 int numberOfUpdatedRows = statement.executeUpdate();
 
@@ -143,9 +149,9 @@ public class TypesDao implements Dao<Tr_type, Integer>   {
 
         @Override
         public void delete(Tr_type item) {
-        String message = "The Tr_typeaction to be deleted should not be null";
+        String message = "The type action to be deleted should not be null";
         Tr_type nonNullTr_typeaction = Objects.requireNonNull(item, message);
-        String sql = "DELETE FROM tr_types WHERE id = ?";
+        String sql = "DELETE FROM " + name_table + " WHERE tr_type=?";
 
         connection.ifPresent(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {

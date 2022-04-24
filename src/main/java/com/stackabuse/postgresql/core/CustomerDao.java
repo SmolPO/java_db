@@ -24,6 +24,7 @@ public class CustomerDao implements Dao<Customer, Integer> {
     private static final Logger LOGGER = Logger.getLogger(CustomerDao.class.getName());
     private final Optional<Connection> connection;
 
+    private String name_table = "customers";
     public CustomerDao() {
         this.connection = JdbcConnection.getConnection();
     }
@@ -32,7 +33,7 @@ public class CustomerDao implements Dao<Customer, Integer> {
     public Optional get(int id) {
         return connection.flatMap(conn -> {
             Optional<Customer> customer = Optional.empty();
-            String sql = "SELECT * FROM customer WHERE customer_id = " + id;
+            String sql = "SELECT * FROM " + name_table + " WHERE customer_id=" + id;
 
             try (Statement statement = conn.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql)) {

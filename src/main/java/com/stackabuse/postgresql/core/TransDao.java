@@ -23,15 +23,16 @@ public class TransDao implements Dao<Trans, Integer> {
     private static final Logger LOGGER = Logger.getLogger(TransDao.class.getName());
     private final Optional<Connection> connection;
 
+    private String name_table = "transactions";
     public TransDao() {
         this.connection = JdbcConnection.getConnection();
     }
 
     @Override
-    public Optional get(int id) {
+    public Optional get(int id) { /// получить все операции одного клиента
         return connection.flatMap(conn -> {
             Optional<Trans> item = Optional.empty();
-            String sql = "SELECT * FROM transactions WHERE id = " + id;
+            String sql = "SELECT * FROM " + name_table + " WHERE customer_id=" + id;
 
             try (Statement statement = conn.createStatement();
                     ResultSet resultSet = statement.executeQuery(sql)) {

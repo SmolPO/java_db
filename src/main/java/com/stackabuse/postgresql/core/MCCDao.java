@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 
 
 public class MCCDao implements Dao<MCC_code, Integer>   {
-        private static final Logger LOGGER = Logger.getLogger(MCC_code.class.getName());
-        private final Optional<Connection> connection;
-
+    private static final Logger LOGGER = Logger.getLogger(MCC_code.class.getName());
+    private final Optional<Connection> connection;
+    private String name_table = "mccs";
     public MCCDao() {
         this.connection = JdbcConnection.getConnection();
     }
@@ -29,7 +29,7 @@ public class MCCDao implements Dao<MCC_code, Integer>   {
         public Optional get(int id) {
         return connection.flatMap(conn -> {
             Optional<MCC_code> item = Optional.empty();
-            String sql = "SELECT * FROM mcc_codes WHERE id = " + id;
+            String sql = "SELECT * FROM " + name_table + " WHERE mcc_code=" + id;
 
             try (Statement statement = conn.createStatement();
                  ResultSet resultSet = statement.executeQuery(sql)) {
@@ -51,7 +51,7 @@ public class MCCDao implements Dao<MCC_code, Integer>   {
         @Override
         public Collection<MCC_code> getAll() {
         Collection<MCC_code> list = new ArrayList<>();
-        String sql = "SELECT * FROM MCC_codeaction";
+        String sql = "SELECT * FROM " + name_table + ";";
 
         connection.ifPresent(conn -> {
             try (Statement statement = conn.createStatement();
@@ -81,6 +81,7 @@ public class MCCDao implements Dao<MCC_code, Integer>   {
         String message = "The MCC_codeaction to be added should not be null";
         MCC_code nonNullMCC_codeaction = Objects.requireNonNull(item, message);
         String sql = "INSERT INTO "
+                + name_table
                 + "SET "
                 + "mcc_code = ?, "
                 + "mcc_description = ?";
@@ -117,21 +118,22 @@ public class MCCDao implements Dao<MCC_code, Integer>   {
 
         @Override
         public void update(MCC_code item) {
-        String message = "The MCC_codeaction to be updated should not be null";
+        String message = "The MCC_code action to be updated should not be null";
         MCC_code nonNullMCC_codeaction = Objects.requireNonNull(item, message);
-        String sql = "UPDATE MCC_codeaction "
+        String sql = "UPDATE "
+                + name_table
                 + "SET "
-                + "first_name = ?, "
-                + "last_name = ?, "
-                + "email = ? "
+                + "mcc_code = ?, "
+                + "mcc_description = ?, "
                 + "WHERE "
-                + "MCC_codeaction_id = ?";
+                + "mcc_code = ?";
 
         connection.ifPresent(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
                 statement.setInt(1, nonNullMCC_codeaction.getMcc_code());
                 statement.setString(2, nonNullMCC_codeaction.getMcc_description());
+                statement.setInt(3, nonNullMCC_codeaction.getMcc_code());
 
                 int numberOfUpdatedRows = statement.executeUpdate();
 

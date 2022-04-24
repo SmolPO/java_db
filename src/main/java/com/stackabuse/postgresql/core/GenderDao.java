@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class GenderDao implements Dao<Gender_train, Integer>   {
         private static final Logger LOGGER = Logger.getLogger(Gender_train.class.getName());
         private final Optional<Connection> connection;
-
+        private String name_table = "genders";
     public GenderDao() {
         this.connection = JdbcConnection.getConnection();
     }
@@ -30,7 +30,7 @@ public class GenderDao implements Dao<Gender_train, Integer>   {
         public Optional get(int id) {
         return connection.flatMap(conn -> {
             Optional<Gender_train> item = Optional.empty();
-            String sql = "SELECT * FROM genders WHERE id = " + id;
+            String sql = "SELECT * FROM " + name_table + " WHERE customer_id=" + id;
 
             try (Statement statement = conn.createStatement();
                  ResultSet resultSet = statement.executeQuery(sql)) {
@@ -52,7 +52,7 @@ public class GenderDao implements Dao<Gender_train, Integer>   {
         @Override
         public Collection<Gender_train> getAll() {
         Collection<Gender_train> list = new ArrayList<>();
-        String sql = "SELECT * FROM Gender_trainaction";
+        String sql = "SELECT * FROM " + name_table + ";";
 
         connection.ifPresent(conn -> {
             try (Statement statement = conn.createStatement();
@@ -73,18 +73,18 @@ public class GenderDao implements Dao<Gender_train, Integer>   {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
         });
-
         return list;
     }
 
         @Override
         public Optional<Integer> save(Gender_train item) {
-        String message = "The Gender_trainaction to be added should not be null";
+        String message = "The Gendern to be added should not be null";
         Gender_train nonNullGender_trainaction = Objects.requireNonNull(item, message);
         String sql = "INSERT INTO "
-                + "SET "
+                + name_table
+                + " VALUES ("
                 + "customer_id = ?, "
-                + "gender = ?";
+                + "gender = ?)";
 
         return connection.flatMap(conn -> {
             Optional<Integer> generatedId = Optional.empty();
@@ -118,9 +118,10 @@ public class GenderDao implements Dao<Gender_train, Integer>   {
 
         @Override
         public void update(Gender_train item) {
-        String message = "The Gender_trainaction to be updated should not be null";
+        String message = "The Gender to be updated should not be null";
         Gender_train nonNullGender_trainaction = Objects.requireNonNull(item, message);
-        String sql = "UPDATE Gender_train "
+        String sql = "UPDATE "
+                + name_table
                 + "SET "
                 + "customer_id = ?, "
                 + "gender = ?";
@@ -133,7 +134,7 @@ public class GenderDao implements Dao<Gender_train, Integer>   {
 
                 int numberOfUpdatedRows = statement.executeUpdate();
 
-                LOGGER.log(Level.INFO, "Was the Gender_train action updated successfully? {0}",
+                LOGGER.log(Level.INFO, "Was the Gender action updated successfully? {0}",
                         numberOfUpdatedRows > 0);
 
             } catch (SQLException ex) {
@@ -146,7 +147,7 @@ public class GenderDao implements Dao<Gender_train, Integer>   {
         public void delete(Gender_train item) {
         String message = "The Gender_trainaction to be deleted should not be null";
         Gender_train nonNullGender_trainaction = Objects.requireNonNull(item, message);
-        String sql = "DELETE FROM Gender_trainaction WHERE id = ?";
+        String sql = "DELETE FROM " + name_table + " WHERE customer_id=?";
 
         connection.ifPresent(conn -> {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {
